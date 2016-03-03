@@ -15,12 +15,22 @@ var model = {
                 return cat;
             }
         }
+    },
+
+    setSelectedCat: function (cat) {
+        this.selectedCat = cat;
+    },
+
+    init: function () {
+        this.selectedCat = this.data[0];
     }
 };
 
 var sideBarView = {
-    init: function (sideBar, data, clickListener, resetListener) {
+    init: function (sideBar, model, clickListener, resetListener) {
         // Iterate through the data and create a span for each
+        sideBar.innerHTML = '';
+        var data = model.data;
         for (var idx = 0; idx < data.length; idx++) {
             var cat = data[idx];
             var catButton = document.createElement('button');
@@ -43,19 +53,24 @@ var sideBarView = {
 };
 
 var mainBarView = {
-    init: function (main) {
+    init: function (main, countListener, model) {
         this.content = main;
+        this.content.innerHTML = '';
+        this.model = model;
+        this.countListener = countListener;
     },
 
-    render: function (cat) {
+    render: function () {
         this.content.innerHTML = '';
-
+        var cat = this.model.selectedCat;
         var header = document.createElement('h3');
         header.textContent = 'This is ' + cat.name;
         this.content.appendChild(header);
 
         var img = document.createElement('img');
         img.src = cat.img;
+        img.addEventListener('click', this.countListener);
+        
         this.content.appendChild(img);
 
         var counter = document.createElement('h3');
@@ -71,20 +86,48 @@ var mainBarView = {
     }
 };
 
+var adminView = {
+    init: function (updateCatDetails) {
+
+        document.getElementById('adminForm').style.display = 'none';
+        document.getElementById('adminButton').addEventListener('click', function () {
+            document.getElementById('adminForm').style.display = 'block';
+        });
+
+        document.getElementById('formResetButton').addEventListener('click', function () {
+            document.getElementById('adminForm').style.display = 'none';
+        });
+
+        document.getElementById('formSubmitButton').addEventListener('click', function () {
+            var newCatName = document.getElementById('catName').value;
+            var newCatUrl = document.getElementById('catURL').value;
+            var newCatCount = document.getElementById('catClickCount').value;
+            updateCatDetails(newCatName, newCatUrl, newCatCount);
+        });
+    },
+}
+
 var controller = {
 
     init: function () {
         this.sideBar = document.getElementById('sidebar');
-        this.sideBar.innerHTML = '';
         this.main = document.getElementById('main');
-        this.main.innerHTML = '';
-        sideBarView.init(this.sideBar, model.data, this.clickListener, this.resetListener);
-        mainBarView.init(this.main);
+        model.init();
+        sideBarView.init(this.sideBar, model, this.clickListener, this.resetListener);
+        mainBarView.init(this.main, this.addCountListener, model);
+        mainBarView.render();
+
+        adminView.init(this.updateCatDetails);
     },
 
     clickListener: function (catData) {
-        catData.count = catData.count + 1;
-        mainBarView.render(catData);
+        model.setSelectedCat(catData);
+        mainBarView.render();
+    },
+
+    addCountListener: function () {
+        model.selectedCat.count = +model.selectedCat.count + 1;
+        mainBarView.render();
     },
 
     resetListener: function () {
@@ -93,6 +136,13 @@ var controller = {
             cat.count = 0;
         }
         mainBarView.reset();
+    },
+
+    updateCatDetails: function (catName, catUrl, catCount) {
+        model.selectedCat.count = catCount;
+        model.selectedCat.img = catUrl;
+        model.selectedCat.name = catName;
+        mainBarView.render();
     }
 };
 

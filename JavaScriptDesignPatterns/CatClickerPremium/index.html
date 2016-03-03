@@ -8,11 +8,30 @@
 </head>
 <body>
 <h1>Multi-Cat Clicker</h1>
+<div id="main" class="main">
+    Cats go here
+</div>
 <div id="sidebar" class="sidebar">
     Cat list goes here!
 </div>
-<div id="main" class="main">
-    Cats go here
+<div id="admin" class="admin">
+    <button id="adminButton">Admin</button>
+    <div id="adminForm">
+        <fieldset>
+            <legend>Edit Details</legend>
+            <label>Name: <br/>
+                <input id="catName" type="text" value="Name.."/> </label>
+            <br/>
+            <label>URL:<br/>
+                <input id="catURL" type="text" value="URL.."/></label>
+            <br/>
+            <label>Click Count:<br/>
+                <input id="catClickCount" type="text" value="Count.."/></label>
+            <br/>
+            <button id="formSubmitButton">Submit</button>
+            <button id="formResetButton">Reset</button>
+        </fieldset>
+    </div>
 </div>
 </body>
 </html>
